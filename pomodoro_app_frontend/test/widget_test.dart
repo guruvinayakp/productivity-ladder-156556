@@ -3,16 +3,18 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:pomodoro_app_frontend/main.dart';
 
 void main() {
-  testWidgets('App generation message displayed', (WidgetTester tester) async {
-    await tester.pumpWidget(const MyApp());
+  testWidgets('App loads home screen with title', (WidgetTester tester) async {
+    await tester.pumpWidget(const PomodoroApp());
+    await tester.pumpAndSettle();
 
-    expect(find.text('pomodoro_app_frontend App is being generated...'), findsOneWidget);
-    expect(find.byType(CircularProgressIndicator), findsOneWidget);
+    expect(find.text('Pomodoro Ladder'), findsOneWidget);
   });
 
-  testWidgets('App bar has correct title', (WidgetTester tester) async {
-    await tester.pumpWidget(const MyApp());
+  testWidgets('Has Roll Dice button disabled by default', (WidgetTester tester) async {
+    await tester.pumpWidget(const PomodoroApp());
+    await tester.pump();
 
-    expect(find.text('pomodoro_app_frontend'), findsOneWidget);
+    final rollButton = find.widgetWithText(ElevatedButton, 'Roll Dice');
+    expect(rollButton, findsOneWidget);
   });
 }

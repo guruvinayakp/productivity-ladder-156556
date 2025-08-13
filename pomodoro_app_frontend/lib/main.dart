@@ -1,54 +1,42 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'pages/history_page.dart';
+import 'pages/home_screen.dart';
+import 'pages/settings_page.dart';
+import 'providers/board_provider.dart';
+import 'providers/history_provider.dart';
+import 'providers/pomodoro_provider.dart';
+import 'theme.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(const PomodoroApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+/// PUBLIC_INTERFACE
+class PomodoroApp extends StatelessWidget {
+  /** Application root: sets theme, providers, and routes. */
+  const PomodoroApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'AI Build Tool',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
-        useMaterial3: true,
-      ),
-      home: const MyHomePage(title: 'pomodoro_app_frontend'),
-    );
-  }
-}
-
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
-      ),
-      body: const Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              'pomodoro_app_frontend App is being generated...',
-              style: TextStyle(fontSize: 18),
-            ),
-            SizedBox(height: 20),
-            CircularProgressIndicator(),
-          ],
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => BoardProvider()),
+        ChangeNotifierProxyProvider<BoardProvider, PomodoroProvider>(
+          create: (ctx) => PomodoroProvider(board: ctx.read<BoardProvider>()),
+          update: (ctx, board, previous) => previous ?? PomodoroProvider(board: board),
         ),
+        ChangeNotifierProvider(create: (_) => HistoryProvider()),
+      ],
+      child: MaterialApp(
+        title: 'Pomodoro Ladder',
+        debugShowCheckedModeBanner: false,
+        theme: buildAppTheme(),
+        routes: {
+          '/': (context) => const HomeScreen(),
+          '/history': (context) => const HistoryPage(),
+          '/settings': (context) => const SettingsPage(),
+        },
       ),
     );
   }
